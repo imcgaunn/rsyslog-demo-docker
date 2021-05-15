@@ -64,4 +64,3 @@ stop-log-servers :
 .PHONY : stop-all-containers
 stop-all-containers : | stop-log-servers stop-app-servers
 	@echo "stopped all running containers"
-

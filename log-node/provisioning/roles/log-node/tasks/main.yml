@@ -1,0 +1,8 @@
+---
+- name: "install postgres as log storage backend (for fun)"
+# need a schema general enough that pretty much any app would fit into it
+# maybe something like "hostname", "application name", "datetime", "msg", "fields", or something like that.
+# is there a way to partition by multiple dimensions? it would be nice to partition by
+# application name and datetime
+- name: "initialize postgres database and create table for 'log_events'"
+- name: ""
