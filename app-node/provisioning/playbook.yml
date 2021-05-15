@@ -1,0 +1,7 @@
+---
+- hosts: "rsys-app-1"
+  become: true
+  vars:
+    ansible_docker_user: "root"
+  roles:
+    - { role: "app-node", tags: ["app-node"] }

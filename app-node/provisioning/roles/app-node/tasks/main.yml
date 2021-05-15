@@ -1,0 +1,32 @@
+---
+# the base image already has rsyslog/rsyslogd itself installed
+- name: "install pre-requisite packages from package manager"
+  apk:
+    name: "{{ apk_packages }}"
+    state: "present"
+    update_cache: true
+  tags:
+    - "apk-packages"
+
+- name: "create install directory for sample 'app'"
+  file:
+    state: "directory"
+    path: "/opt/app"
+    mode: 0755
+  tags:
+    - "mk-install-dir"
+- name: "create log directory for sample 'app'"
+  file:
+    state: "directory"
+    path: "/var/log/app"
+    mode: 0755
+  tags:
+    - "mk-log-dir"
+
+- name: "copy script to app install location"
+  copy:
+    src: "sampleapp.py"
+    dest: "/opt/app/"
+    mode: 0755  # excecute for all!
+  tags:
+    - "deploy-app"

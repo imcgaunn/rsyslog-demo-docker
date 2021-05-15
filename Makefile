@@ -23,6 +23,11 @@ LOG_IMAGE_NAME := rsyslog-example-logserver
 build-log-image: log-node/Dockerfile
 	cd log-node && docker build -t $(LOG_IMAGE_NAME) .
 
+.PHONY : fmt
+fmt :
+	@echo "running formatter on project"
+	prettier -w .
+
 ### starting/stopping experiments
 DOCKER_NETWORK := rsyslognet
 .PHONY : start-docker-network
