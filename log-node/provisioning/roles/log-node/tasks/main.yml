@@ -72,10 +72,21 @@
     owner: "{{ rsyslog_db_user }}"
   tags:
     - "rsyslog-db"
+- name: "copy createschema.sql script to an accessible location"
+  copy:
+    src: "createschema.sql"
+    dest: "{{ create_schema_dest_loc }}"
+    owner: "postgres"
+    group: "postgres"
+  tags:
+    - "create-logs-table"
 - name: "create log_events table in logs database"
   become: true
   become_user: "postgres"
   become_method: "su"
-  debug:
-    msg: "this should create a log_events table in the database instead of printing this message!"
-# TODO: rsyslog configuration! that's the hardest part of this whole thing
+  shell:
+    cmd: "psql -U {{ rsyslog_db_user }} -f {{ create_schema_dest_loc }} logs"
+  tags:
+    - "create-logs-table"
+# TODO: install rsyslog configuration! that's the hardest part of this whole thing
+- name: ""

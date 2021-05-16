@@ -4,3 +4,5 @@ rsyslog_db_pass: "password"
 
 psql_data_dir: "/data/psql"
 psql_run_dir: "/run/postgresql"
+
+create_schema_dest_loc: "/tmp/createschema.sql"
