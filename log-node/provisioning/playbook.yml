@@ -1,0 +1,7 @@
+---
+- hosts: "rsys-log-1"
+  become: true
+  vars:
+    ansible_docker_user: "root"
+  roles:
+    - { role: "log-node", tags: ["log-node"] }

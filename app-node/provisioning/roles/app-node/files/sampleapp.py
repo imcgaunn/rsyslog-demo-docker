@@ -10,6 +10,14 @@ SECONDS_BETWEEN_LOGS = 5
 
 file_handler = logging.FileHandler(APP_LOG_PATH, mode="a", encoding="utf8")
 stdout_handler = logging.StreamHandler(stream=sys.stdout)
+# set up log formatter so that time and level will be included in log
+# records
+log_formatter = logging.Formatter(
+    "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+# register formatter with the handlers
+file_handler.setFormatter(log_formatter)
+stdout_handler.setFormatter(log_formatter)
 logging.basicConfig(level=logging.INFO, handlers=[file_handler, stdout_handler])
 logger = logging.getLogger(__name__)
 

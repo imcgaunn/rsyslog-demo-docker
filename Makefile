@@ -43,9 +43,15 @@ stop-docker-network : | stop-all-containers
 .PHONY : start-app-servers
 start-app-servers : | stop-app-servers start-docker-network
 	@echo "starting app server containers"
-	docker run --name rsys-app-1 --network $(DOCKER_NETWORK) -dit $(APP_IMAGE_NAME)
-	docker run --name rsys-app-2 --network $(DOCKER_NETWORK) -dit $(APP_IMAGE_NAME)
-	docker run --name rsys-app-3 --network $(DOCKER_NETWORK) -dit $(APP_IMAGE_NAME)
+	docker run --name rsys-app-1 \
+		--network $(DOCKER_NETWORK) \
+		-dit $(APP_IMAGE_NAME)
+	docker run --name rsys-app-2 \
+		--network $(DOCKER_NETWORK) \
+		-dit $(APP_IMAGE_NAME)
+	docker run --name rsys-app-3 \
+		--network $(DOCKER_NETWORK) \
+		-dit $(APP_IMAGE_NAME)
 
 .PHONY : stop-app-servers
 stop-app-servers :
@@ -57,8 +63,12 @@ stop-app-servers :
 .PHONY : start-log-servers
 start-log-servers :
 	@echo "starting log server containers"
-	docker run --name rsys-log-1 -dit $(LOG_IMAGE_NAME)
-	docker run --name rsys-log-2 -dit $(LOG_IMAGE_NAME)
+	docker run --name rsys-log-1 \
+		--network $(DOCKER_NETWORK) \
+		-dit $(LOG_IMAGE_NAME)
+	docker run --name rsys-log-2 \
+		--network $(DOCKER_NETWORK) \
+		-dit $(LOG_IMAGE_NAME)
 
 .PHONY : stop-log-servers
 stop-log-servers :

@@ -1,0 +1,6 @@
+---
+rsyslog_db_user: "rsyslog"
+rsyslog_db_pass: "password"
+
+psql_data_dir: "/data/psql"
+psql_run_dir: "/run/postgresql"

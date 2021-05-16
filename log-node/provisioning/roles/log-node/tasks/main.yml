@@ -1,8 +1,75 @@
 ---
 - name: "install postgres as log storage backend (for fun)"
-# need a schema general enough that pretty much any app would fit into it
-# maybe something like "hostname", "application name", "datetime", "msg", "fields", or something like that.
-# is there a way to partition by multiple dimensions? it would be nice to partition by
-# application name and datetime
-- name: "initialize postgres database and create table for 'log_events'"
-- name: ""
+  apk:
+    name: "postgresql"
+    state: "present"
+    update_cache: true
+- name: "create {{ psql_data_dir }} directory for postgres data"
+  file:
+    state: "directory"
+    path: "{{ psql_data_dir }}"
+    mode: "0750"
+    owner: "postgres"
+    group: "postgres" # postgres user should have been created when the package was installed
+  tags:
+    - "psql-data-dir"
+- name: "create {{ psql_run_dir }} directory for postgres unix sockets"
+  file:
+    state: "directory"
+    path: "{{ psql_run_dir }}"
+    mode: "0750"
+    owner: "postgres"
+    group: "postgres"
+  tags:
+    - "psql-run-dir"
+- name: "check if data dir empty (do we need to reinit db?)"
+  find:
+    paths: "{{ psql_data_dir }}/"
+  register: data_dir_files
+
+- name: "data dir is not empty; assuming db initialized"
+  debug:
+    msg: "data dir is not empty, assuming db initialized"
+  when: data_dir_files.matched > 0
+
+- name: "data dir is empty; initializing database"
+  block:
+    - name: "run initdb as the postgres user"
+      become: true
+      become_user: "postgres"
+      become_method: "su"
+      shell:
+        cmd: "PGDATA={{ psql_data_dir }} initdb"
+  tags:
+    - "init-postgres-database"
+  when: data_dir_files.matched <= 0
+- name: "start the database with pg_ctl"
+  become: true
+  become_user: "postgres"
+  become_method: "su"
+  shell:
+    cmd: "PGDATA={{ psql_data_dir }} pg_ctl start"
+  tags:
+    - "start-postgres-database"
+- name: "create a new database user for rsyslog"
+  become: true
+  become_user: "postgres"
+  become_method: "su"
+  community.postgresql.postgresql_user:
+    name: "{{ rsyslog_db_user }}"
+    password: "{{ rsyslog_db_pass }}"
+    state: "present"
+  tags:
+    - "rsyslog-db-user"
+- name: "create a new database for log_events, owned by rsyslog db user"
+  become: true
+  become_user: "postgres"
+  become_method: "su"
+  community.postgresql.postgresql_db:
+    name: "logs"
+    state: "present"
+    owner: "{{ rsyslog_db_user }}"
+  tags:
+    - "rsyslog-db"
+
+# TODO: rsyslog configuration! that's the hardest part of this whole thing
