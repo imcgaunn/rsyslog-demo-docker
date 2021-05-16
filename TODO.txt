@@ -1,0 +1,10 @@
+Big Items Remaining for PoC:
+
+- rsyslog configuration for app servers that will forward all messages
+  from /var/log/app/app.log to a remote syslog server (one of the log nodes)
+
+- rsyslog configuration for log nodes that will receive messages from tcp
+  transport and send them along to postgres using the postgres output module
+
+- settle on schema for log_events table - there's a draft in
+  log-node/provisioning/roles/log-node/files/createschema.sql
