@@ -24,7 +24,7 @@
     - "psql-run-dir"
 - name: "check if data dir empty (do we need to reinit db?)"
   find:
-    paths: "{{ psql_data_dir }}/"
+    paths: ["{{ psql_data_dir }}/"]
   register: data_dir_files
 
 - name: "data dir is not empty; assuming db initialized"
@@ -43,6 +43,7 @@
   tags:
     - "init-postgres-database"
   when: data_dir_files.matched <= 0
+
 - name: "start the database with pg_ctl"
   become: true
   become_user: "postgres"
@@ -71,5 +72,10 @@
     owner: "{{ rsyslog_db_user }}"
   tags:
     - "rsyslog-db"
-
+- name: "create log_events table in logs database"
+  become: true
+  become_user: "postgres"
+  become_method: "su"
+  debug:
+    msg: "this should create a log_events table in the database instead of printing this message!"
 # TODO: rsyslog configuration! that's the hardest part of this whole thing

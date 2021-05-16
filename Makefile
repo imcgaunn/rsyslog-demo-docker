@@ -33,7 +33,9 @@ DOCKER_NETWORK := rsyslognet
 .PHONY : start-docker-network
 start-docker-network : | stop-docker-network
 	@echo "creating docker bridge network"
-	docker network create --attachable --driver bridge --subnet 10.8.9.0/24 $(DOCKER_NETWORK)
+	docker network create --attachable \
+		--driver bridge \
+		--subnet 10.8.9.0/24 $(DOCKER_NETWORK)
 
 .PHONY : stop-docker-network
 stop-docker-network : | stop-all-containers
@@ -61,7 +63,7 @@ stop-app-servers :
 	-docker rm -f rsys-app-3
 
 .PHONY : start-log-servers
-start-log-servers :
+start-log-servers : | start-docker-network
 	@echo "starting log server containers"
 	docker run --name rsys-log-1 \
 		--network $(DOCKER_NETWORK) \
@@ -75,7 +77,17 @@ stop-log-servers :
 	@echo "shutting down and removing log server containers"
 	-docker rm -f rsys-log-1
 	-docker rm -f rsys-log-2
- 
+
+.PHONY : provision-log-servers
+provision-log-servers : | stop-docker-network start-log-servers
+	@echo "provisioning log servers"
+	cd log-node/provisioning && ansible-playbook playbook.yml --diff
+
+.PHONY : provision-app-servers
+provision-app-servers : | stop-docker-network start-app-servers
+	@echo "provisioning app servers"
+	cd app-node/provisioning && ansible-playbook playbook.yml --diff
+
 .PHONY : stop-all-containers
 stop-all-containers : | stop-log-servers stop-app-servers
 	@echo "stopped all running containers"
